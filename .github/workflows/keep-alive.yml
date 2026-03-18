@@ -1,0 +1,28 @@
+# Render 实例保活脚本
+name: Keep Render Instance Alive
+
+# 定时触发：每5分钟执行一次（免费版足够，避免太频繁）
+on:
+  schedule:
+    - cron: '*/5 * * * *'  # 格式：分 时 日 月 周，*/5 表示每5分钟
+  # 可选：手动触发
+  workflow_dispatch:
+
+# 设置权限
+permissions:
+  contents: read
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+    steps:
+      # 发送 HTTP 请求到你的 Render 服务
+      - name: Send Keep-Alive Request
+        run: |
+          curl -X GET \
+          --max-time 120 \  
+          -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36" \
+          "https://chat.13701.top" \
+          -w "\nStatus Code: %{http_code}\nResponse Time: %{time_total}s\n" \
+          -o /dev/null 
+        continue-on-error: true  # 即使请求失败（比如冷启动中），也不中断工作流
